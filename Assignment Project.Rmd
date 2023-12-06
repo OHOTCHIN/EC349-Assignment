@@ -1,0 +1,283 @@
+---
+title: "EC 349 Assignment Project"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Tabula statement
+
+We're part of an academic community at Warwick.
+
+Whether studying, teaching, or researching, we’re all taking part in an expert conversation which must meet standards of academic integrity. When we all meet these standards, we can take pride in our own academic achievements, as individuals and as an academic community.
+
+Academic integrity means committing to honesty in academic work, giving credit where we've used others' ideas and being proud of our own achievements.
+
+In submitting my work I confirm that:
+
+1. I have read the guidance on academic integrity provided in the Student Handbook and understand the University regulations in relation to Academic Integrity. I am aware of the potential consequences of Academic Misconduct
+
+2. I declare that the work is all my own, except where I have stated otherwise.
+
+3. No substantial part(s) of the work submitted here has also been submitted by me in other credit bearing assessments courses of study (other than in certain cases of a resubmission of a piece of work), and I acknowledge that if this has been done this may lead to an appropriate sanction.
+
+4. Where a generative Artificial Intelligence such as ChatGPT has been used I confirm I have abided by both the University guidance and specific requirements as set out in the Student Handbook and the Assessment brief. I have clearly acknowledged the use of any generative Artificial Intelligence in my submission, my reasoning for using it and which generative AI (or AIs) I have used. Except where indicated the work is otherwise entirely my own.
+
+5. I understand that should this piece of work raise concerns requiring investigation in relation to any of points above, it is possible that other work I have submitted for assessment will be checked, even if marks (provisional or confirmed) have been published.
+
+6. Where a proof-reader, paid or unpaid was used, I confirm that the proofreader was made aware of and has complied with the University’s proofreading policy.
+
+7. I consent that my work may be submitted to Turnitin or other analytical technology. I understand the use of this service (or similar), along with other methods of maintaining the integrity of the academic process, will help the University uphold academic standards and assessment fairness.
+
+Privacy statement
+
+The data on this form relates to your submission of coursework. The date and time of your submission, your identity, and the work you have submitted will be stored. We will only use this data to administer and record your coursework submission.
+
+Related articles
+
+[Reg. 11 Academic Integrity (from 4 Oct 2021)](https://warwick.ac.uk/services/gov/calendar/section2/regulations/academic_integrity/)
+
+[Guidance on Regulation 11](https://websignon.warwick.ac.uk/origin/oidc)
+
+[Proofreading Policy](https://warwick.ac.uk/services/aro/dar/quality/categories/examinations/policies/v_proofreading/)
+
+[Education Policy and Quality Team](https://warwick.ac.uk/services/aro/dar/quality/az/acintegrity/framework/guidancereg11/)
+
+[Academic Integrity (warwick.ac.uk)](https://warwick.ac.uk/students/learning-experience/academic_integrity)
+
+
+
+## Data processing
+
+Deciding on which data science methodology to use is an important one. In this module we were introduced to a range of structured approaches to apply data to address a problem of interest. Although TDSP, OSEMN, SEMMA, KDD, and Waterfall were covered (Shafique, Qaiser, 2014), the systems of methods examined in the most detail were John Rollins’ General Data Science Methodology (BAD_RCUP-MED/F) and the Cross-Industry Standard Process for Data Mining (CRISP-DM).
+
+The chosen methodology for this report was CRISP-DM which has six key stages: business/problem understanding, data understanding, data preparation, modelling, evaluation, and deployment. This method was chosen because of its cyclicality which supports data science’s iterative nature, its flexibility, and its strong finish highlighting the modelling and evaluation stages (Schröer, Kruse, Gómez, 2021). Despite a criticism levelled against CRISP-DM being it struggles with the considerations of big data projects, the smaller datasets used in this project assuaged these concerns.
+
+## Project challenges
+
+There were several challenges which arose while carrying out this project. From a personal perspective, the newness of both RStudio and GitHub meant undertaking an independent piece of research like this was not always straight forward. Additionally, at times it was difficult to have full faith in how I specified models and chose between statistical methods, especially when there were trade-offs involved. Nonetheless, the amount of content and advice on online data science community forums certainly helped with this aspect of the assignment. 
+
+However, arguably the biggest challenge faced was the size of the original Yelp datasets. It was often the case that the computers which I was able to access simply were not able to cope with and use most of the data. The option to use the smaller datasets provided was useful, although having the requisite computational power would have undoubtedly allowed for slightly different analysis to have been undertaken in certain parts of this report. Moreover, if this was a genuine product being delivered by a team for a client, owning a GitHub enterprise account which can cope with having larger datasets loaded to it would allow for more frequent commits and as such would be advantageous.
+
+## Exploratory analysis part one
+
+So-called rating review prediction has become an in-demand challenge in the world of machine learning as of late (Asghar, 2016). In attempting to solve this problem and create a predictive model I first downloaded the two small datasets: “review_data_small” and “user_data_small”. Furthermore, as it contained a manageable 150,000 observations, I proceeded in downloading the business dataset: “yelp_academic_dataset_business”. As this was a .json file it of course required conversion to an R dataframe using the provided code: “processing_yelp_data.R”.
+
+From here I checked if I needed to convert any variables of interest to factor variables and then created a new variable which represented the number of characters in a review. This was created as a result of the hypothesis that longer text reviews would be more likely to accompany lower star ratings. I also created a pairwise spearman correlation matrix between variables of interest.
+
+Part of the task was to split the data into training and test datasets, using `set.seed(1)` for reproducibility purposes. As such, this was subsequently done in the test-to-train ratio of 1:3, ensuring a test sample size of at least 10,000 randomly drawn observations. 
+
+Then, my statistical learning approach was to run a linear regression and obtain both its mean squared error (MSE) and correlation accuracy. Given that this task was one of prediction rather than interpretation, I then turned my attention to ridge regression. In general, the shrinkage of parameters enforced by ridge regression may lead to them being biased, however it may also mean they perform very well for predicting the dependent variable. 
+
+This was carried out in R using cross-validation techniques and as per OLS, MSE and correlation accuracy were calculated. 
+
+Finally, using the same cross-validation method of splitting the dataset into multiple folds, I estimated the parameters using a lasso regression, also calculating its MSE and correlation accuracy.
+
+Moving away from OLS, ridge, and lasso regression methods, I decided to look at other predictive techniques covered in the module. And so, to gain flexibility in understanding the relationship between independent and dependent variables, I looked at the flexible approach of decision trees and bagging techniques. 
+
+## Initial results
+
+Starting with the linear regression, I obtained a mean squared error of 2.03 and a correlation accuracy coefficient of 0.269. Hoping to lower the MSE, a ridge regression was then estimated which returned the figures of 2.03 and 0.268 for the same statistics, respectively. The lambda calculated was 0.0415. The estimation of a lasso regression followed this which also resulted in a near-identical MSE of 2.03 and correlation accuracy coefficient of 0.268 when compared with the OLS and ridge regression models. Additionally, the value of lambda calculated was 0.00915. Furthermore, a decision tree was plotted, meanwhile bagging regression trees with 50 bootstrap replications led to an out-of-bag estimate of root MSE of 1.48. 
+
+## Exploratory analysis and results part two
+
+Not content with what I perceived to be a set of high MSEs, I then respecified my models by combining the review data with the business data so that I could include new variables of interest such as the star rating of the business receiving the review. Once again, I estimated a linear regression model which suitably returned a lower MSE of 1.60 and a higher correlation accuracy of 0.518. I attempted to then run ridge and lasso regressions with these new specifications however I was frustratingly returned with a ‘matrix_as_dense()’ error which I was unable to resolve. Then, plotting another decision tree, there was a slight improvement on predicting a five star rating compared to guessing its likelihood randomly based on the 46% of reviews overall being five stars. 
+
+Ultimately, there are trade-offs involved when picking between most of the models covered in this module. For instance, lasso and ridge are less flexible in that their constraining of parameters makes them more restrictive, whereas there can be issues with high variance using the approach of regression and classification – something bagging seeks to ameliorate. 
+
+## Concluding remarks
+
+It must be said that the problem of rating review prediction is certainly a challenging one. Many reviewers and businesses only partially fill out the requested information in review forms which results in data frames containing many blank variables – in some cases the English alphabet was not always used in the written review response section either adding further complexity. Moreover, there are likely various endogeneity issues relating to the characteristics of people who decide to fill out review forms. On this, those leaving reviews are likely to have a stronger opinion of their experience, be it good or bad, which potentially leads to a dearth of more middling reviews recorded.  
+
+Finally, it is worth noting that an interesting path for future research would be taking the route of sentiment analysis. This kind of text analysis might look to plot the average rating associated with each word against the number of reviews featuring the same word. Furthermore, a predictive model could be estimated which looks to plot the sentiment score of each word with the average star rating of reviews. Additionally, there are other models which could have been employed in attempting to address this problem such as, but by no means limited to, logistic and probit models.  
+
+#### Word count: 1224
+
+## References
+
+Asghar, N., 2016. Yelp dataset challenge: Review rating prediction. *arXiv preprint arXiv:1605.05362.*
+
+Schröer, C., Kruse, F. and Gómez, J.M., 2021. A systematic literature review on applying CRISP-DM process model. *Procedia Computer Science,* 181, pp.526-534.
+
+Shafique, U. and Qaiser, H., 2014. A comparative study of data mining process models (KDD, CRISP-DM and SEMMA). *International Journal of Innovation and Scientific Research,* 12(1), pp.217-222.
+
+
+
+```{r echo = FALSE}
+#clear Memory and Screen
+cat("\014")
+rm(list=ls())
+
+library(jsonlite)
+library(glmnet)
+library(ggplot2)
+library(tidyverse)
+library(tree)
+library(rpart)
+library(rpart.plot)
+library(caret)
+
+#Load datasets
+as_tibble(load("~/Downloads/yelp_review_small.Rda"))
+load("~/Downloads/yelp_user_small.Rda")
+
+business_data <- as_tibble(stream_in(file("/Users/oliverhotchin/Downloads/yelp_academic_dataset_business.json")))
+
+reviews<-as_tibble(review_data_small)
+
+
+reviews$chars = lengths(strsplit(reviews$text, ' '))
+reviews$chars <- nchar(reviews$text)
+reviews <- reviews[,c(4,5,6,7,10)]
+ 
+correlations <- cor(reviews[,c(2,3,4,5)], use="pairwise", method="spearman")
+
+set.seed(1)
+i <- sample(1:nrow(reviews), 3*nrow(reviews)/4)
+
+train <- reviews[i,]
+test <- reviews[-i,]
+
+trainX <- train[,-1]
+trainY <- train[,1]
+
+testX <- test[,-1]
+testY <- test[,1]
+
+#Linear
+lr <- lm(formula = stars ~ useful+funny+cool+chars, data = train)
+summary(lr)
+lrPredict <- predict(lr, newdata = test)
+lrAccuracy <- cor(lrPredict, test$stars)
+lrMSE<-mean((lrPredict-test$stars)^2)
+paste("The correlation accuracy for linear regression model is: ", lrAccuracy*100,"%")
+
+#Ridge with Cross Validation
+crossV <- cv.glmnet(as.matrix(trainX), as.matrix(trainY), alpha = 0, nfolds = 3)
+plot(crossV)
+rLambda <- crossV$lambda.min
+
+rr<-glmnet(as.matrix(trainX), as.matrix(trainY), alpha = 0, lambda = rLambda, thresh = 1e-12)
+rrPredict <- predict(rr, s = rLambda, newx = as.matrix(testX))
+rrAccuracy <- cor(rrPredict, test$stars)
+rrMSE<-mean((rrPredict-test$stars)^2)
+paste("The correlation accuracy for linear regression model is: ", rrAccuracy*100,"%")
+
+#Lasso with Cross Validation
+lscrossV <- cv.glmnet(as.matrix(trainX), as.matrix(trainY), alpha = 1, nfolds = 3)
+plot(lscrossV)
+lsLambda <- lscrossV$lambda.min
+
+lsr<-glmnet(as.matrix(trainX), as.matrix(trainY), alpha = 1, lambda = lsLambda, thresh = 1e-12)
+lsrPredict <- predict(lsr, s = lsLambda, newx = as.matrix(testX))
+lsrAccuracy <- cor(lsrPredict, test$stars)
+lsrMSE<-mean((lsrPredict-test$stars)^2)
+paste("The correlation accuracy for linear regression model is: ", lsrAccuracy*100,"%")
+
+library(lmtest)
+library(sandwich)
+coeftest(lr, vcov = vcovHC(lr, type="HC3"))
+
+rpart_tree<-rpart(stars~., data=train, control=rpart.control(minsplit=2, minbucket=1, cp=0.002))
+rpart.plot(rpart_tree, box.palette = "red")
+
+
+library(ipred)       #for fitting bagged decision trees
+set.seed(1312)       #make this example reproducible
+
+#fit the bagged model
+bag <- bagging(stars~., data=train, nbagg = 50, coob = TRUE, control = rpart.control(minsplit = 1, cp = 0.001))
+bag
+
+```
+
+```{r echo = FALSE}
+#clear Memory and Screen
+cat("\014")
+rm(list=ls())
+
+library(jsonlite)
+library(glmnet)
+library(ggplot2)
+library(tidyverse)
+library(tree)
+library(rpart)
+library(rpart.plot)
+
+#Load Data Sets
+as_tibble(load("~/Downloads/yelp_review_small.Rda"))
+load("~/Downloads/yelp_user_small.Rda")
+
+business_data <- as_tibble(stream_in(file("/Users/oliverhotchin/Downloads/yelp_academic_dataset_business.json")))
+
+dataSet <- merge(review_data_small, business_data, by = "business_id")
+dataSet$length <- nchar(dataSet$text)
+dataSet <- dataSet[,c(4,5,6,7,17,18,23)] #14
+rm(business_data)
+rm(review_data_small)
+dataSet$stars.y <- as_factor(dataSet$stars.y)
+
+set.seed(1)
+i <- sample(1:nrow(dataSet), 3*nrow(dataSet)/4)
+
+train <- dataSet[i,]
+test <- dataSet[-i,]
+
+trainX <- train[,-1]
+trainY <- train[,1]
+
+testX <- test[,-1]
+testY <- test[,1]
+
+lr <- lm(formula = stars.x ~ useful+funny+stars.y+cool+length+review_count, data = train)
+summary(lr)
+lrPredict <- predict(lr, newdata = test)
+lrAccuracy <- cor(lrPredict, test$stars.x)
+lrMSE<-mean((lrPredict-test$stars.x)^2)
+paste("The correlation accuracy for linear regression model is: ", lrAccuracy*100,"%")
+
+library(rpart)
+library(forcats)
+library(rpart.plot)
+library(dplyr)
+rpart_tree<-rpart(as_factor(stars.x)~., data=train)
+rpart.plot(rpart_tree)
+
+predict_unseen <-predict(rpart_tree, test, type = 'class')
+
+table_mat <- table(test$stars.x, predict_unseen)
+accuracy_Test <- sum(diag(table_mat)) / sum(table_mat)
+accuracy_Test
+test%>%count(stars.x)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
